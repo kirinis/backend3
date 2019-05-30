@@ -9,5 +9,6 @@
         <label style="margin-top: 5px">Пароль:</label>
         <input type="password" class="form-control" name="pswd">
         <button type="submit" class="btn btn-primary" style="margin-top: 15px">Войти</button>
+        <a style="margin-left: 30px" href="<?= \User\RouteUser::getInstance()->getRestoreLink(); ?>">Восстановить пароль</a>
     </form>
 </div>

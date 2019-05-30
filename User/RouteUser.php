@@ -23,6 +23,11 @@ class RouteUser
         return $this->url . "?doUserAction=restore";
     }
 
+    public function getRestorePass()
+    {
+        return $this->url . "?restore=" . $_GET['restoreEmail'];
+    }
+
 
     private function __construct()
     {
@@ -43,9 +48,16 @@ class RouteUser
             if ($_POST['doUserAction'] == 'restoreEmail') {
                 $this->action = 'restoreEmail';
             }
+
+            if ($_POST['doUserAction'] == 'restorePass') {
+                $this->action = 'newPass';
+            }
         }
         if (isset($_GET['token'])) {
             $this->action = 'token';
+        }
+        if (isset($_GET['restoreEmail'])) {
+            $this->action = 'resPass';
         }
     }
 

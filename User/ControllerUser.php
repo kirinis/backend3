@@ -62,28 +62,47 @@ class ControllerUser extends BaseController
         $this->content = $this->render('restore-email.tpl.php');
     }
 
+    public function newPass()
+    {
+        $data = $_POST;
+        $data['restore'] = $_GET['restore'];
+        if ($data['pswd'] == $data['pswd2']) {
+            $this->Model->restoreEmail($data);
+            echo "Ваш пароль обновлен";
+        } else {
+            echo "Пароли не совпадают";
+            $this->content = $this->render('newPassForm.tpl.php');
+        }
+
+    }
+
+    public function resPass()
+    {
+        $data1 = $_GET;
+        $time = $this->Model->getRestoreTime($data1);
+        $t = time() - $time['restoreTime'];
+        if ($t < 3600) {
+            $this->content = $this->render('newPassForm.tpl.php');
+        } else {
+            echo "Прошло больше часа, вы не можете восстановить пароль по этой ссылке, запросите новую ссылку";
+        }
+    }
+
     public function restoreEmail()
     {
         $data1 = $_POST;
-        $pswd = $this->genPasswordOne();
-        $data1['pswd'] = $pswd;
-        $data = $this->Model->restoreEmail($data1);
-        var_export($data);
+        $all = $this->Model->getAll($data1);
+        $all['restoreTime'] = time();
+        $this->Model->restoreTime($all);
         $mail['email'] = $data1['email'];
-        $mail['body'] = "Ваш новый пароль: $pswd";
-        $mail['send'] = 'Новый пароль отправлен вам на email';
+        $mail['body'] = 'Для ввода нового пароля перейдите по ссылке, ссылка действует в течении часа: 
+                <a href="http://' . $_SERVER['SERVER_NAME'] . ':81' . $_SERVER['PHP_SELF'] . '?restoreEmail=' . $all['token'] . '"><b>Восстановить</b></a>';
+        $mail['send'] = 'Письмо отправлено';
         $mail['subject'] = 'Восстановление пароля';
         $this->SendEmail($mail);
 
     }
 
-    function genPasswordOne($length = 8)
-    {
-        $password = "";
-        for ($i = 0; $i < $length; $i++)
-            $password .= chr(mt_rand(97, 122)); // 97 - это a, а 122 - это z
-        return $password;
-    }
 
     public function loginIn()
     {
@@ -104,7 +123,7 @@ class ControllerUser extends BaseController
     public function token()
     {
         $data1 = $_GET;
-        $data = $this->Model->token($data1);
+        $data = $this->Model->getToken($data1);
         if (!$data['activemail']) {
             $act = $this->Model->activEmail($data);
             echo 'Спасибо за подтверждения Email-а';

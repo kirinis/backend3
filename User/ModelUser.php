@@ -14,10 +14,33 @@ class ModelUser extends ModelBase
         $this->funFildsCreate['pswd']['end'] = ") ";
     }
 
+    public function getRestoreTime($data)
+    {
+        $sql = "SELECT restoreTime FROM " . $this->table . " WHERE token='" . $data['restoreEmail'] . "'";
+        $res = MySQLi_DB::getInstance()->execute($sql);
+        $row = $res->fetch_assoc();
+        return $row;
 
-    public function token($data)
+    }
+
+    public function restoreTime($data)
+    {
+        $sql = "UPDATE " . $this->table . " SET restoreTime = '" . $data['restoreTime'] . "' WHERE token = '" . $data['token'] . "'";
+        $res = MySQLi_DB::getInstance()->execute($sql);
+
+    }
+
+    public function getToken($data)
     {
         $sql = "SELECT token, activemail FROM " . $this->table . " WHERE token='" . $data['token'] . "'";
+        $res = MySQLi_DB::getInstance()->execute($sql);
+        $row = $res->fetch_assoc();
+        return $row;
+    }
+
+    public function getAll($data)
+    {
+        $sql = "SELECT * FROM " . $this->table . " WHERE email='" . $data['email'] . "'";
         $res = MySQLi_DB::getInstance()->execute($sql);
         $row = $res->fetch_assoc();
         return $row;
@@ -41,9 +64,8 @@ class ModelUser extends ModelBase
 
     public function restoreEmail($data)
     {
-        $sql = "UPDATE " . $this->table . " SET pswd = MD5('" . $data['pswd'] . "') WHERE email = '" . $data['email'] . "'";
+        $sql = "UPDATE " . $this->table . " SET pswd = MD5('" . $data['pswd'] . "') WHERE token='" . $data['restore'] . "'";
         $res = MySQLi_DB::getInstance()->execute($sql);
 
-        return $res;
     }
 }
