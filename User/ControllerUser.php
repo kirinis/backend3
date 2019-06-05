@@ -10,22 +10,10 @@ class ControllerUser extends BaseController
     private $content;
     private $error;
 
-    public function isUserLogin()
-    {
-        return false;
-    }
-
-    public function doStartUserSession()
-    {
-    }
-
-    public function doEndUserSession()
-    {
-    }
 
     public function getWiget()
     {
-        if ($this->isUserLogin()) {
+        if (isset($_SESSION['auth']) == 'true') {
             return $this->render("wiget-login.tpl.php");
         } else {
             return $this->render("wiget-guest.tpl.php");
@@ -68,12 +56,25 @@ class ControllerUser extends BaseController
         $data['restore'] = $_GET['restore'];
         if ($data['pswd'] == $data['pswd2']) {
             $this->Model->restoreEmail($data);
-            echo "Ваш пароль обновлен";
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Ваш пароль обновлен</div>';
         } else {
-            echo "Пароли не совпадают";
-            $this->content = $this->render('newPassForm.tpl.php');
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Пароли не совпадают</div>';
+            $this->content .= $this->render('newPassForm.tpl.php');
         }
 
+    }
+
+    public function logout()
+    {
+        $_SESSION = [];
+        session_destroy();
+    }
+
+    public function favorite()
+    {
+        $this->content = $this->render('favorite.tpl.php');
     }
 
     public function resPass()
@@ -84,7 +85,8 @@ class ControllerUser extends BaseController
         if ($t < 3600) {
             $this->content = $this->render('newPassForm.tpl.php');
         } else {
-            echo "Прошло больше часа, вы не можете восстановить пароль по этой ссылке, запросите новую ссылку";
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Прошло больше часа, вы не можете восстановить пароль по этой ссылке, запросите новую ссылку</div>';
         }
     }
 
@@ -97,10 +99,10 @@ class ControllerUser extends BaseController
         $mail['email'] = $data1['email'];
         $mail['body'] = 'Для ввода нового пароля перейдите по ссылке, ссылка действует в течении часа: 
                 <a href="http://' . $_SERVER['SERVER_NAME'] . ':81' . $_SERVER['PHP_SELF'] . '?restoreEmail=' . $all['token'] . '"><b>Восстановить</b></a>';
-        $mail['send'] = 'Письмо отправлено';
         $mail['subject'] = 'Восстановление пароля';
         $this->SendEmail($mail);
-
+        $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Письмо отправлено</div>';
     }
 
 
@@ -111,12 +113,14 @@ class ControllerUser extends BaseController
         //     var_export($data);
         if ($data) {
             if ($data['activemail']) {
-                $this->content = $this->render('wiget-login.tpl.php');
+                $_SESSION['auth'] = 'true';
             } else {
-                echo 'Подтвердите ваш email!';
+                $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Подтвердите ваш email!</div>';
             }
         } else {
-            echo "НЕправильный логин или пароль!";
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   НЕправильный логин или пароль!</div>';
         }
     }
 
@@ -126,9 +130,11 @@ class ControllerUser extends BaseController
         $data = $this->Model->getToken($data1);
         if (!$data['activemail']) {
             $act = $this->Model->activEmail($data);
-            echo 'Спасибо за подтверждения Email-а';
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Спасибо за подтверждения Email-а</div>';
         } else {
-            echo 'Вы уже подтвердили Email. Спасибо!';
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Вы уже подтвердили Email. Спасибо!</div>';
         }
     }
 
@@ -147,12 +153,14 @@ class ControllerUser extends BaseController
                 . 'Для подтверждения регистрации перейдите по ссылке: 
                 <a href="http://' . $_SERVER['SERVER_NAME'] . ':81' . $_SERVER['PHP_SELF'] . '?token=' . $data1['token'] . '"><b>Подтверждение</b></a>';
             $mail['email'] = $data1['email'];
-            $mail['send'] = 'Письмо с подтверждением регистрации отправлено';
             $mail['subject'] = 'Подтверждение регистрации';
             $this->SendEmail($mail);
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Письмо с подтверждением регистрации отправлено</div>';
         } else {
-            $this->content = $this->render("register-form.tpl.php");
-            echo "Пароли не совпадают!";
+            $this->content = '<div class="alert alert-warning text-center" role="alert">
+                   Пароли не совпадают!</div>';
+            $this->content .= $this->render("register-form.tpl.php");
         }
 
     }

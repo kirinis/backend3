@@ -8,6 +8,16 @@ class RouteUser
     private $url;
     public $action;
 
+    public function getFavoritLink()
+    {
+        return $this->url . "?doUserAction=favorite";
+    }
+
+    public function getLogoutLink()
+    {
+        return $this->url . "?doUserAction=logout";
+    }
+
     public function getRegisterLink()
     {
         return $this->url . "?doUserAction=register";

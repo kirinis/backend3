@@ -7,7 +7,7 @@ class ModelUser extends ModelBase
 
     public function __construct()
     {
-        $this->table = "user";
+        $this->table = "users";
         $this->addFilds = array("email", "pswd", "token");
 
         $this->funFildsCreate['pswd']['start'] = " MD5(";

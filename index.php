@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <?php
-
+session_start();
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader

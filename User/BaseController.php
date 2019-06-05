@@ -47,8 +47,8 @@ class BaseController
             $mail->Subject = $data['subject'];
             $mail->Body = $data['body'];
             $mail->send();
-            echo $data['send'];
         } catch (Exception $e) {
+
             echo "Сообщение не может быть отправлено. Ошибка: {$mail->ErrorInfo}";
         }
     }
